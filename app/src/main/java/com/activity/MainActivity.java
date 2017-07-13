@@ -163,28 +163,12 @@ public class MainActivity extends AppCompatActivity implements PoiSearch.OnPoiSe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.openQrCodeScan: {
-                new AlertDialog.Builder(MainActivity.this).setItems(new String[]{"从相册选取", "摄像头扫描"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case 0:{
-                                intent = new Intent(Intent.ACTION_PICK);
-                                intent.setDataAndType(MediaStore.Images.Media.INTERNAL_CONTENT_URI, "image/*");
-                                startActivityForResult(intent, REQUESTCODE_Album);
-                                break;
-                            }
-                            case 1:{
-                                //打开二维码扫描界面
-                                if (CommonUtil.isCameraCanUse()) {
-                                    startActivityForResult(new Intent(MainActivity.this, ScanActivity.class), REQUESTCODE_QR);
+                if (CommonUtil.isCameraCanUse()) {
+                    startActivityForResult(new Intent(MainActivity.this, ScanActivity.class), REQUESTCODE_QR);
 //                                    startActivityForResult(new Intent(MainActivity.this, ZbarScannerActivity.class), REQUESTCODE_QR);
-                                } else {
-                                    Toast.makeText(MainActivity.this, "请打开此应用的摄像头权限！", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }
-                    }
-                }).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "请打开此应用的摄像头权限！", Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
             case R.id.textView_GPS_error:{
@@ -355,29 +339,6 @@ public class MainActivity extends AppCompatActivity implements PoiSearch.OnPoiSe
                             break;
                         }
                     }
-                    break;
-                }
-            case REQUESTCODE_Album:{
-                System.out.println("开始扫描图片");
-                final String QR_path=new ImageUtils(MainActivity.this).intentLoadToPath(intent);
-                System.out.println("图片路径为"+QR_path);
-//                final String file_path = new File(Environment.getExternalStorageDirectory(), "QR.jpg").getAbsolutePath();
-                new AsyncTask<Void, Void, String>() {
-                    @Override
-                    protected String doInBackground(Void... params) {
-                        return QRCodeDecoder.syncDecodeQRCode(QR_path);
-                    }
-
-                    @Override
-                    protected void onPostExecute(String device_kjlabel) {
-                        if (TextUtils.isEmpty(device_kjlabel)) {
-                            Toast.makeText(MainActivity.this, "未发现二维码", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MainActivity.this, device_kjlabel, Toast.LENGTH_SHORT).show();
-                            showCodeDialog(device_kjlabel);
-                        }
-                    }
-                }.execute();
                     break;
                 }
         }
